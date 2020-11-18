@@ -12,8 +12,8 @@ namespace Windows_Explorer
     {
         DirectoryInfo dir;
         FileSystemInfo[] allFiles;
-
         FileSystemInfo buffer;
+        DriveInfo[] drives;
         int copy = 0;
         public void App()
         {
@@ -22,22 +22,43 @@ namespace Windows_Explorer
             Catalog();
         }
 
-        public void Start() 
+
+
+        public void Start()
         {
             Console.Clear();
-            string[] disk = new string[2];
-            disk[0] = "C:";
-            disk[1] = "D:";
-            int x = Menu.VerticalMenu(disk);
-            if (x == 0)
-                dir = new DirectoryInfo("C:/");
-            else if (x == 1)
-                dir = new DirectoryInfo("D:/");
-            else if (x == -1)
-                Start();
+            drives = DriveInfo.GetDrives();
+
+            int lenMaxStr = 0;
+            string str;
+            int lenReadyDrives = 0;
+            for (int i = 0; i < drives.Length; i++)
+            {
+                if (drives[i].IsReady)
+                {
+                    str = $"{Menu.FormatBytes(drives[i].AvailableFreeSpace)} свободно из {Menu.FormatBytes(drives[i].TotalSize)}";
+                    if (str.Length > lenMaxStr)
+                        lenMaxStr = str.Length;
+                    lenReadyDrives++;
+                }
+            }
+
+            DriveInfo[] drivesReady = new DriveInfo[lenReadyDrives];
+            int j = 0;
+            for (int i = 0; i < drives.Length; i++)
+            {
+                if (drives[i].IsReady)
+                {
+                    drivesReady[j] = drives[i];
+                    j++;
+                }
+            }
+
+            int pos = Menu.DriveMenu(drivesReady, lenReadyDrives, lenMaxStr);
+            dir = new DirectoryInfo(drivesReady[pos].Name);
         }
 
-        void Normalize()
+        void Streamline()// ставит директории перед файлами
         {
             for (int j = 0; j < allFiles.Length; j++)
             {
@@ -53,16 +74,13 @@ namespace Windows_Explorer
             try
             {
                 allFiles = dir.GetFileSystemInfos();
-                Normalize();
-
+                Streamline();
             }
             catch
             {
                 FileOpen();
                 Back();
             }
-
-
         }
 
         public void Catalog()
@@ -136,19 +154,94 @@ namespace Windows_Explorer
         {
             try
             {
-                ((DirectoryInfo)buffer).MoveTo(dir.FullName + "\\" + buffer.Name);
+                DirectoryInfo[] dirs = dir.GetDirectories();
+                bool check = false;
+                foreach (var item in dirs)
+                {
+                    if (item.Name == buffer.Name)
+                        check = true;
+                }
+                if (check == false)
+                    ((DirectoryInfo)buffer).MoveTo(dir.FullName + "\\" + buffer.Name);
+                else
+                {
+                    Console.Clear();
+                    Console.SetCursorPosition(30, 10);
+                    Console.WriteLine("Папка с таким именем уже существует");
+                    System.Threading.Thread.Sleep(2000);
+                    return;
+                }
+
             }
             catch
             {
-                ((FileInfo)buffer).MoveTo(dir.FullName + "\\" + buffer.Name);
+                FileInfo[] files = dir.GetFiles();
+                bool check = false;
+                foreach (var item in files)
+                {
+                    if (item.Name == buffer.Name)
+                        check = true;
+                }
+                if (check == false)
+                    ((FileInfo)buffer).MoveTo(dir.FullName + "\\" + buffer.Name);
+                else
+                {
+                    Console.Clear();
+                    Console.SetCursorPosition(30, 10);
+                    Console.WriteLine("Файл с таким именем уже существует");
+                    System.Threading.Thread.Sleep(2000);
+                    return;
+                }
             }
         }
 
-        void PasteCopy(string dir, string FromDir, string ToDir)
+        void PasteCopy(string fileName, string FromDir, string ToDir)
         {
-            Directory.CreateDirectory(FromDir);
-            PasteCopyRec(FromDir, ToDir + "\\" + Path.GetFileName(dir));
-        }
+            try
+            {
+                DirectoryInfo[] dirs = dir.GetDirectories();
+                bool check = false;
+                foreach (var item in dirs)
+                {
+                    if (item.Name == fileName)
+                        check = true;
+                }
+                if (check == false)
+                {
+                    Directory.CreateDirectory(FromDir);
+                    PasteCopyRec(FromDir, ToDir + "\\" + Path.GetFileName(fileName));
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.SetCursorPosition(30, 10);
+                    Console.WriteLine("Папка с таким именем уже существует");
+                    System.Threading.Thread.Sleep(2000);
+                    return;
+                }
+            }
+            catch
+            {
+                FileInfo[] files = dir.GetFiles();
+                bool check = false;
+                foreach (var item in files)
+                {
+                    if (item.Name == fileName)
+                        check = true;
+                }
+                if (check == false)
+                    ((FileInfo)buffer).CopyTo(dir.FullName + "\\" + buffer.Name);
+                else
+                {
+                    Console.Clear();
+                    Console.SetCursorPosition(30, 10);
+                    Console.WriteLine("Файл с таким именем уже существует");
+                    System.Threading.Thread.Sleep(2000);
+                    return;
+                }
+            }
+
+         }
 
         void PasteCopyRec(string FromDir, string ToDir)
         {
@@ -219,6 +312,9 @@ namespace Windows_Explorer
             }
             catch
             {
+                Console.Clear();
+                Console.BackgroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.Black;
                 Console.WriteLine("Невозможно открыть файл");
                 Console.ReadKey();
             }
@@ -297,7 +393,7 @@ namespace Windows_Explorer
         {
             SortArr(str, 0, dirs, res);
             SortArr(str, dirs, dirs + files, res);
-            Normalize();
+            Streamline();
         }
 
         public void Back()
