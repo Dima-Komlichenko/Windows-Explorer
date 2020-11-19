@@ -15,14 +15,13 @@ namespace Windows_Explorer
         FileSystemInfo buffer;
         DriveInfo[] drives;
         int copy = 0;
+
         public void App()
         {
             Start();
             FillAllFiles();
             Catalog();
         }
-
-
 
         public void Start()
         {
@@ -83,7 +82,7 @@ namespace Windows_Explorer
             }
         }
 
-        public void Catalog()
+        void Catalog()
         {
             if (allFiles.GetLength(0) == 0)
             {
@@ -150,7 +149,8 @@ namespace Windows_Explorer
             }
             Catalog();
         }
-        public void PasteCut(FileSystemInfo buf)
+
+        void PasteCut(FileSystemInfo buf)
         {
             try
             {
@@ -171,7 +171,6 @@ namespace Windows_Explorer
                     System.Threading.Thread.Sleep(2000);
                     return;
                 }
-
             }
             catch
             {
@@ -240,8 +239,7 @@ namespace Windows_Explorer
                     return;
                 }
             }
-
-         }
+        }
 
         void PasteCopyRec(string FromDir, string ToDir)
         {
@@ -257,59 +255,40 @@ namespace Windows_Explorer
             }
         }
 
-        public void Cut(int pos, FileSystemInfo[] elements, string address)
+        void Cut(int pos, FileSystemInfo[] elements, string address)
         {
             FileInfo[] files = dir.GetFiles();
             DirectoryInfo[] files2 = dir.GetDirectories();
-
             for (int i = 0; i < files.Length; i++)
             {
                 if (elements[pos].Name == files[i].Name)
-                {
                     buffer = files[i];
-                }
             }
-
             for (int i = 0; i < files2.Length; i++)
             {
                 if (elements[pos].Name == files2[i].Name)
-                {
                     buffer = files2[i];
-                }
             }
-
         }
-        public void Copy(int pos, FileSystemInfo[] elements)
+        void Copy(int pos, FileSystemInfo[] elements)
         {
             FileInfo[] files = dir.GetFiles();
             DirectoryInfo[] files2 = dir.GetDirectories();
-
-
             for (int i = 0; i < files.Length; i++)
             {
                 if (elements[pos].Name == files[i].Name)
-                {
                     buffer = files[i];
-                }
             }
-
             for (int i = 0; i < files2.Length; i++)
             {
                 if (elements[pos].Name == files2[i].Name)
-                {
                     buffer = files2[i];
-
-                }
             }
-
         }
 
         void FileOpen()
         {
-            try
-            {
-                Process.Start(dir.FullName);
-            }
+            try { Process.Start(dir.FullName); }
             catch
             {
                 Console.Clear();
@@ -323,7 +302,7 @@ namespace Windows_Explorer
         {
             string[] s = { "Директория", "Файл" };
             string name = "";
-            int num = Menu.MessageBox("Что вы хотите создать, директорию или файл?", s, ref name);
+            int num = Menu.MessageBoxCreate("Что вы хотите создать, директорию или файл?", s, ref name);
 
             switch (num)
             {
@@ -338,14 +317,8 @@ namespace Windows_Explorer
 
         void FileDel(string address)
         {
-            try
-            {
-                Directory.Delete(address, true);
-            }
-            catch
-            {
-                File.Delete(address);
-            }
+            try { Directory.Delete(address, true); }
+            catch { File.Delete(address); }
         }
 
         void Swap(ref FileSystemInfo s1, ref FileSystemInfo s2)
@@ -366,18 +339,15 @@ namespace Windows_Explorer
                     if (res == ACTION.TEXT_UP || res == ACTION.TEXT_DOWN)
                         comp = String.Compare(str[i].Name, str[i + 1].Name);
 
-
                     else if (res == ACTION.DATE_UP || res == ACTION.DATE_DOWN)
                         comp = DateTime.Compare(str[i].LastWriteTime, str[i + 1].LastWriteTime);
-
 
                     else if (res == ACTION.TYPE_UP || res == ACTION.TYPE_DOWN)
                         if (str[i] is DirectoryInfo)
                             comp = String.Compare(str[i].Extension, str[i + 1].Extension);
                         else return;
 
-
-                    else // if (obj == SORT_OBJECT.SIZE)
+                    else // if (res == ACTION.SIZE)
                         if (str[i] is FileInfo)
                         comp = ((FileInfo)str[i]).Length > ((FileInfo)str[i + 1]).Length ? 1 : -1;
                     else return;
@@ -389,14 +359,14 @@ namespace Windows_Explorer
             }
         }
 
-        public void Sort(FileSystemInfo[] str, int dirs, int files, ACTION res)
+        void Sort(FileSystemInfo[] str, int dirs, int files, ACTION res)
         {
             SortArr(str, 0, dirs, res);
             SortArr(str, dirs, dirs + files, res);
             Streamline();
         }
 
-        public void Back()
+        void Back()
         {
             string address = dir.FullName;
             int sizeNewAddress = dir.FullName.Length - dir.Name.ToString().Length - 1;

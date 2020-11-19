@@ -8,24 +8,24 @@ using System.Threading.Tasks;
 namespace Windows_Explorer
 {
     public enum ACTION
-    { ENTER, SORT, ADD, DEL, BACKSPASE, TEXT_UP, TEXT_DOWN, DATE_UP, DATE_DOWN, SIZE_UP, SIZE_DOWN, TYPE_UP, TYPE_DOWN, NOTHING, COPY, PASTE, CUT }
+    { ENTER, ADD, DEL, BACKSPASE, TEXT_UP, TEXT_DOWN, DATE_UP, DATE_DOWN, SIZE_UP, SIZE_DOWN, TYPE_UP, TYPE_DOWN, NOTHING, COPY, PASTE, CUT }
 
     public class Menu
     {
         static int[] maxLen = { 40, 20, 20, 20 };
-        static string[,] shapka =
+        static string[,] TopPanel =
         {
             { "Text", "Date","Type", "Size" },
             { "Text↑", "Date↑","Type↑", "Size↑" },
             { "Text↓", "Date↓", "Type↓","Size↓" }
          };
 
-        static string[] usedShapka =
+        static string[] usedTopPanel =
         {
             "Text", "Date", "Type", "Size"
         };
 
-        static string[] staticShapka =
+        static string[] staticusedTopPanel =
         {
             "Text", "Date","Type", "Size"
         };
@@ -42,20 +42,17 @@ namespace Windows_Explorer
             Console.ForegroundColor = ConsoleColor.Black;
 
             Console.WriteLine(address);
-            for (int i = 0; i < usedShapka.Length; i++)
+            for (int i = 0; i < usedTopPanel.Length; i++)
             {
-                Console.Write(usedShapka[i].PadRight(maxLen[i]));
+                Console.Write(usedTopPanel[i].PadRight(maxLen[i]));
             }
             x = 0;
             y = 3;
             int pos = 0;
             if (elements.Length == 0)
-            {
                 Console.WriteLine("Эта папка пуста.".PadLeft(45));
-            }
             else
             {
-
                 for (int i = 0; i < elements.GetLength(0); i++)
                 {
                     if (i == pos)
@@ -69,7 +66,6 @@ namespace Windows_Explorer
                     PrintString(elements, address, i, ConsoleColor.White);
                 }
             }
-
         }
 
         private static void PrintString(FileSystemInfo[] elements, string address, int pos, ConsoleColor cc)
@@ -130,11 +126,12 @@ namespace Windows_Explorer
                     case ConsoleKey.Enter:
                         if (elements.Length != 0)
                         {
-                            for (int i = 0; i < usedShapka.Length; i++)
-                                usedShapka[i] = staticShapka[i];
+                            for (int i = 0; i < usedTopPanel.Length; i++)
+                                usedTopPanel[i] = staticusedTopPanel[i];
                             return ACTION.ENTER;
                         }
                         break;
+
                     case ConsoleKey.UpArrow:
                         if (elements.Length != 0)
                             PrintString(elements, address, pos, ConsoleColor.White);
@@ -156,14 +153,15 @@ namespace Windows_Explorer
                         break;
 
                     case ConsoleKey.Backspace:
-                        for (int i = 0; i < usedShapka.Length; i++)
-                            usedShapka[i] = staticShapka[i];
+                        for (int i = 0; i < usedTopPanel.Length; i++)
+                            usedTopPanel[i] = staticusedTopPanel[i];
                         return ACTION.BACKSPASE;
-                    case ConsoleKey.Z:       return ACTION.ADD;
-                    case ConsoleKey.Delete:  return ACTION.DEL;
-                    case ConsoleKey.C:       return ACTION.COPY;
-                    case ConsoleKey.V:       return ACTION.PASTE;
-                    case ConsoleKey.X:       return ACTION.CUT;
+
+                    case ConsoleKey.Z: return ACTION.ADD;
+                    case ConsoleKey.Delete: return ACTION.DEL;
+                    case ConsoleKey.C: return ACTION.COPY;
+                    case ConsoleKey.V: return ACTION.PASTE;
+                    case ConsoleKey.X: return ACTION.CUT;
                     default:
                         break;
                 }
@@ -179,7 +177,6 @@ namespace Windows_Explorer
             {
                 dblSByte = bytes / 1024.0;
             }
-
             return String.Format("{0:0.##} {1}", dblSByte, Suffix[i]);
         }
 
@@ -232,63 +229,10 @@ namespace Windows_Explorer
                     default:
                         break;
                 }
-
-                        //int maxLen = 0;
-                        //foreach (var item in elements)
-                        //{
-                        //    if (item.Length > maxLen)
-                        //        maxLen = item.Length;
-                        //}
-                        //int x = Console.CursorLeft;
-                        //int y = Console.CursorTop;
-                        //Console.CursorVisible = false;
-                        //int pos = 0;
-                        //while (true)
-                        //{
-                        //    for (int i = 0; i < elements.Length; i++)
-                        //    {
-                        //        Console.SetCursorPosition(x, y + i);
-                        //        if (i == pos)
-                        //        {
-                        //            Console.BackgroundColor = ConsoleColor.Blue;
-                        //        }
-                        //        else
-                        //        {
-                        //            Console.BackgroundColor = ConsoleColor.White;
-                        //        }
-                        //        Console.Write(elements[i].PadRight(maxLen));
-                        //    }
-                        //    Console.BackgroundColor = ConsoleColor.White;
-
-                        //    ConsoleKey consoleKey = Console.ReadKey().Key;
-                        //    switch (consoleKey)
-                        //    {
-
-                        //        case ConsoleKey.Enter:
-
-                        //            Console.CursorVisible = true;
-                        //            return pos;
-
-                        //        case ConsoleKey.UpArrow:
-                        //            if (pos > 0)
-                        //                pos--;
-                        //            break;
-
-                        //        case ConsoleKey.DownArrow:
-                        //            if (pos < elements.Length)
-                        //                pos++;
-                        //            break;
-
-                        //        default:
-                        //            break;
-                        //    }
-
-
-                        //}
-                }
+            }
         }
 
-        public static ACTION GorizontallMenu(FileSystemInfo[] elements, string address/*, int maxLen*/)
+        public static ACTION GorizontallMenu(FileSystemInfo[] elements, string address)
         {
             int pos = 0;
             while (true)
@@ -296,7 +240,7 @@ namespace Windows_Explorer
                 int x = 0;
                 int y = 1;
 
-                for (int i = 0; i < usedShapka.Length; i++)
+                for (int i = 0; i < usedTopPanel.Length; i++)
                 {
                     Console.SetCursorPosition(x, y);
                     x += maxLen[i];
@@ -308,7 +252,7 @@ namespace Windows_Explorer
                     {
                         Console.BackgroundColor = ConsoleColor.White;
                     }
-                    Console.Write(usedShapka[i].PadRight(maxLen[i]));
+                    Console.Write(usedTopPanel[i].PadRight(maxLen[i]));
                 }
                 Console.BackgroundColor = ConsoleColor.White;
                 ConsoleKey consoleKey = Console.ReadKey().Key;
@@ -316,7 +260,7 @@ namespace Windows_Explorer
                 {
 
                     case ConsoleKey.Enter:
-                        return ChangeUsedShapka(pos);
+                        return ChangeTopPanel(pos);
 
                     case ConsoleKey.RightArrow:
                         if (pos < 3)
@@ -339,9 +283,7 @@ namespace Windows_Explorer
             }
         }
 
-
-
-        public static int MessageBox(string text, string[] variants, ref string name)
+        public static int MessageBoxCreate(string text, string[] variants, ref string name)
         {
             Console.BackgroundColor = ConsoleColor.Gray;
             Console.ForegroundColor = ConsoleColor.Black;
@@ -354,8 +296,6 @@ namespace Windows_Explorer
             Console.SetCursorPosition(25, 11);
             Console.Write("".PadRight(50));
             Console.SetCursorPosition(25, 12);
-
-
 
             Console.WriteLine("".PadRight(15) + variants[0] + "".PadRight(6) + variants[1] + "".PadRight(15));
 
@@ -374,7 +314,6 @@ namespace Windows_Explorer
             Console.ForegroundColor = ConsoleColor.Black;
             Console.Write("".PadRight(5));
 
-
             Console.BackgroundColor = ConsoleColor.Gray;
             Console.ForegroundColor = ConsoleColor.Black;
             Console.SetCursorPosition(25, 16);
@@ -383,11 +322,9 @@ namespace Windows_Explorer
             Console.Write("".PadRight(50));
             Console.SetCursorPosition(25, 18);
 
-
             Console.SetCursorPosition(30, 15);
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
-
 
             ConsoleColor bg = ConsoleColor.Gray;
             ConsoleColor fg = ConsoleColor.Black;
@@ -447,7 +384,7 @@ namespace Windows_Explorer
         }
 
 
-        private static void FillName(out string name)
+        static void FillName(out string name)
         {
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
@@ -456,15 +393,15 @@ namespace Windows_Explorer
             Console.BackgroundColor = ConsoleColor.Gray;
             Console.ForegroundColor = ConsoleColor.Black;
         }
-        private static ACTION ChangeUsedShapka(int pos)
+        static ACTION ChangeTopPanel(int pos)
         {
-            for (int i = 0; i < usedShapka.Length; i++)
+            for (int i = 0; i < usedTopPanel.Length; i++)
                 if (i != pos)
-                    usedShapka[i] = shapka[0, i];
+                    usedTopPanel[i] = TopPanel[0, i];
 
-            if (usedShapka[pos].Contains("↓"))
+            if (usedTopPanel[pos].Contains("↓"))
             {
-                usedShapka[pos] = shapka[1, pos];
+                usedTopPanel[pos] = TopPanel[1, pos];
                 if (pos == 0)
                     return ACTION.TEXT_UP;
 
@@ -478,7 +415,7 @@ namespace Windows_Explorer
             }
             else
             {
-                usedShapka[pos] = shapka[2, pos];
+                usedTopPanel[pos] = TopPanel[2, pos];
                 if (pos == 0)
                     return ACTION.TEXT_DOWN;
                 if (pos == 1)
